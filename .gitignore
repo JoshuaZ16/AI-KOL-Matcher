@@ -1,0 +1,17 @@
+# 环境变量与本地配置
+.env
+.env.*
+!.env.example
+.claude/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# 本地输出与缓存
+output/
+
+# 系统文件
+.DS_Store

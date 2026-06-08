@@ -1,0 +1,11 @@
+# 项目依赖
+# 数据处理
+pandas>=2.0.0
+numpy>=1.22.4
+python-dateutil>=2.8.2
+pytz>=2020.1
+tzdata>=2022.7
+
+# LLM 调用（Qwen 走 OpenAI 兼容协议）
+openai>=1.0.0
+python-dotenv>=1.0.0
