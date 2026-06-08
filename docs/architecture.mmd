@@ -1,0 +1,55 @@
+flowchart TD
+    A["用户输入投放需求"] --> B["前端 Web 工作台<br/>static/index.html + app.js"]
+    B --> C["后端推荐 API<br/>api.py::recommend"]
+
+    C --> D["需求解析模块<br/>input_parser.py + requirement_extractor.py"]
+    D --> D1{"是否配置<br/>DASHSCOPE_API_KEY"}
+    D1 -->|是| D2["Qwen 自然语言结构化抽取"]
+    D1 -->|否或调用失败| D3["本地规则解析兜底"]
+    D2 --> E["结构化投放需求"]
+    D3 --> E
+
+    C --> F["达人数据加载<br/>utils.py"]
+    F --> F1["默认达人库<br/>data/kol_database.csv"]
+    F --> F2["用户上传 CSV"]
+    F1 --> G["字段标准化与数值清洗"]
+    F2 --> G
+
+    E --> H["筛选模块<br/>filter.py"]
+    G --> H
+    H --> H1["候选达人池"]
+
+    H1 --> J["语义匹配模块<br/>embeddings.py"]
+    E --> J
+    J --> J1{"Embedding 是否可用"}
+    J1 -->|是| J2["text-embedding-v4<br/>需求与达人画像相似度"]
+    J1 -->|否或调用失败| J3["本地规则语义兜底"]
+
+    H1 --> I["评分模块<br/>scorer.py"]
+    E --> I
+    J2 --> I
+    J3 --> I
+    I --> I1["平台 / 领域 / 受众匹配"]
+    I --> I2["粉丝量 / 互动率 / 转化率"]
+    I --> I3["成本效率 / 历史合作 / 风险分"]
+    I1 --> S["综合规则评分"]
+    I2 --> S
+    I3 --> S
+
+    S --> K["ROI 估算<br/>roi.py"]
+    K --> L["Top-K 排序<br/>sort_top_k"]
+    L --> M["TOP 10 推荐结果"]
+    M --> N["推荐理由与投放建议<br/>report.py"]
+    N --> O["前端推荐详情展示"]
+    O --> P["导出 HTML / Markdown 报告"]
+
+    DP1["设计原则：LLM 不直接决定最终排名"] -.-> L
+    DP2["排名由结构化规则评分 + 语义相似度 + ROI 指标共同决定"] -.-> L
+    DP3["AI 主要负责需求理解、语义增强和推荐解释"] -.-> D
+    DP3 -.-> J
+    DP3 -.-> N
+    DP4["无 API Key 时仍可通过本地规则完整跑通"] -.-> D3
+    DP4 -.-> J3
+
+    classDef principle fill:#eef7f8,stroke:#0f8b95,color:#12333a;
+    class DP1,DP2,DP3,DP4 principle;
